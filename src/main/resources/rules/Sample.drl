@@ -1,0 +1,80 @@
+package com.cisco.container.webservices
+ 
+import com.drools.dto.UserAttributes
+import com.drools.dto.Response
+import java.util.ArrayList
+import com.drools.dto.Attributes
+import com.drools.dto.Constants
+rule "name check"
+salience 100
+no-loop true
+	when
+		inputObj : Attributes(id == "APIxMasheryId.gen" || id == "EFExtAPI.gen" ,clientAppId == "3vnsayyvcr6bgkacf8wahkn8",type == "user")
+	then 
+		
+		inputObj.setStatus(true); 
+		
+		
+		update(inputObj);
+end;
+
+
+rule "name check2"
+salience 100
+no-loop true
+	when
+		inputObj : UserAttributes(id == Constants.USER_ID || id == Constants.EFEXTUSER_ID , type == Constants.USER , loggedId == Constants.SAS)
+	then		
+		inputObj.setStatus(Constants.TRUE); 		
+		update(inputObj);
+end;
+
+rule "name check1"
+salience 90
+no-loop true
+	when
+		inputObj : Attributes(id == "APIxMasheryId.gen" || id == "EFExtAPI.gen" ,clientAppId == "3vnsayyvcr6bgkacf8wahkn8");
+		outputObj: Response(reasonCode==6)
+	then 
+	   ArrayList<String> $obj = outputObj.getResourses();
+	  
+	 	   
+	   
+	     outputObj.setReasonCode(1);
+	     outputObj.setMessage(Constants.SUCCESS);
+		 outputObj.setResourses($obj);
+		update(outputObj);
+end;
+
+
+
+rule "contracts resources check"
+salience 90
+no-loop true
+	when
+		inputObj : Attributes(id == Constants.USER_ID || id == Constants.EFEXTUSER_ID ,(clientAppId == Constants.CLIENT_ID ||clientAppId.length()==24));
+		outputObj: Response(reasonCode==Constants.REASON_CODE)
+	then 
+	   ArrayList<String> $obj = outputObj.getResourses();
+
+	     outputObj.setReasonCode(Constants.SUCCESS_REASON_CODE);
+	     outputObj.setMessage(Constants.SUCCESS);
+		 outputObj.setResourses($obj);
+		update(outputObj);
+end;
+
+rule "products resources check"
+salience 90
+no-loop true
+	when
+		inputObj : Attributes(id == Constants.USER_ID || id == Constants.EFEXTUSER_ID ,(clientAppId == Constants.CLIENT_ID ||clientAppId.length()==24));
+		outputObj: Response(reasonCode==Constants.PRODUCTREASON_CODE)
+	then 
+       ArrayList<String> $obj = outputObj.getResourses();
+             outputObj.setReasonCode(Constants.SUCCESS_REASON_CODE);
+	   outputObj.setMessage(Constants.SUCCESS);
+	   outputObj.setResourses($obj);
+	   update(outputObj);
+end;
+
+
